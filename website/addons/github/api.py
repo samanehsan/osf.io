@@ -186,7 +186,13 @@ class GitHub(object):
         http://developer.github.com/v3/repos/contents/#get-contents
 
         """
-        return self.repo(user, repo).contents(path.encode('utf-8'), ref)
+        try:
+            contents = self.repo(user, repo).contents(path.encode('utf-8'), ref)
+        except GitHubError as error:
+            if 'requested blob is too large' in error.message:
+                raise TooBigError()
+            raise
+        return contents or None
 
     # TODO: Test
     def starball(self, user, repo, archive='tar', ref='master'):
