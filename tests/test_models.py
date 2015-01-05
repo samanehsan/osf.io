@@ -290,7 +290,14 @@ class TestUser(OsfTestCase):
         assert_equal(u.get_confirmation_url('foo@bar.com'),
                 '{0}confirm/{1}/{2}/'.format(settings.DOMAIN, u._primary_key, 'abcde'))
 
-    def test_confirm_primary_email(self):
+    @mock.patch('website.mailchimp_utils.get_mailchimp_api')
+    def test_confirm_primary_email(self, mock_get_mailchimp_api):
+        # mock call to mailchimp api
+        list_name = 'foo'
+        mock_client = mock.MagicMock()
+        mock_get_mailchimp_api.return_value = mock_client
+        mock_client.lists.list.return_value = {'data': [{'id': 1, 'list_name': list_name}]}
+
         u = UserFactory.build(username='foo@bar.com')
         u.is_registered = False
         u.is_claimed = False

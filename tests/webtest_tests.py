@@ -1131,8 +1131,15 @@ class TestClaimingAsARegisteredUser(OsfTestCase):
         )
         self.project.save()
 
+    @mock.patch('website.mailchimp_utils.get_mailchimp_api')
     @mock.patch('website.project.views.contributor.session')
-    def test_user_with_claim_url_registers_new_account(self, mock_session):
+    def test_user_with_claim_url_registers_new_account(self, mock_session, mock_get_mailchimp_api):
+        # mock call to mailchimp api
+        list_name = 'foo'
+        mock_client = mock.MagicMock()
+        mock_get_mailchimp_api.return_value = mock_client
+        mock_client.lists.list.return_value = {'data': [{'id': 1, 'list_name': list_name}]}
+
         # Assume that the unregistered user data is already stored in the session
         mock_session.data = {
             'unreg_user': {
