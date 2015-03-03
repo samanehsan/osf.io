@@ -5,9 +5,33 @@
     <title>${ meeting['name'] } Presentations</title>
 
     <%namespace name="globals" file="base.mako" />
-    ${globals.includes_top()}}
+    ${globals.includes_top()}
 
-    % for url in js_bottom:
+    % if sentry_dsn_js:
+    <script src="/static/vendor/bower_components/raven-js/dist/raven.min.js"></script>
+    <script src="/static/vendor/bower_components/raven-js/plugins/jquery.js"></script>
+    <script>
+        Raven.config('${ sentry_dsn_js }', {}).install();
+    </script>
+    % else:
+    <script>
+        window.Raven = {};
+        Raven.captureMessage = function(msg, context) {
+            console.error('=== Mock Raven.captureMessage called with: ===');
+            console.log('Message: ' + msg);
+            console.log(context);
+        };
+        Raven.captureException = function(err, context) {
+            console.error('=== Mock Raven.captureException called with: ===');
+            console.log('Error: ' + err);
+            console.log(context);
+        };
+    </script>
+    % endif
+
+    <script src="${"/static/public/js/vendor.js" | webpack_asset}"></script>
+
+    % for url in globals.javascript_bottom():
         <script src="${url}"></script>
     % endfor
 
@@ -20,20 +44,10 @@
         <h2 style="padding-bottom: 30px;">${ meeting['name'] } Posters & Talks</h2>
 
         % if meeting['logo_url']:
-            <img src="${ meeting['logo_url'] }" class="image-responsive" />
+            <img src="${ meeting['logo_url'] }" class="image-responsive" style="width:100%"/>
             <br /><br />
         % endif
 
-        % if meeting['info_url']:
-            <div><a href="${ meeting['info_url'] }" target="_blank">Add your poster or talk</a></div>
-        % else:
-            <div><a href="#submit">Add your poster or talk</a></div>
-        % endif
-
-        <div style="padding-bottom: 30px;">
-            Search results by title or author:
-            <input id="gridSearch" />
-        </div>
         <div id="grid" style="width: 100%;"></div>
 
         % if not meeting.get('info_url'):
@@ -73,13 +87,13 @@
     </div>
 
     <script type="text/javascript">
-        var data = ${data};
-        $script('/static/js/conference.js');
-        $script.ready('conference', function() {
-            new Meeting(data);
-        })
+        window.contextVars = window.contextVars || {};
+        window.contextVars.meetingData = ${data};
+        % if meeting['active'] and meeting['info_url']: 
+            window.contextVars.tbInstructionsLink =  '${ meeting['info_url'] }'; 
+        % endif 
     </script>
-
+    <script src=${"/static/public/js/conference-page.js" | webpack_asset}></script>
 </body>
 
 </html>
