@@ -287,6 +287,9 @@ def celery_worker(level="debug"):
     cmd = 'celery worker -A framework.tasks -l {0}'.format(level)
     run(bin_prefix(cmd))
 
+@task
+def memcached(echo=True):
+    run('memcached -d', echo=True)
 
 @task
 def rabbitmq():
