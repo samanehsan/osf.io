@@ -3,12 +3,16 @@
 
 ## Getting started
 
+Install memcached:
+```$ brew install memcached```
+
 From the root osf directory:
 
 ```bash
 pip install -r requirements.txt
 # Required for browse-able API
 python manage.py collectstatic
+invoke memcached
 invoke server
 ```
 
