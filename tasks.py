@@ -289,6 +289,7 @@ def celery_worker(level="debug"):
 
 @task
 def memcached(echo=True):
+    """ Start the memcached server as a daemon. Used as the caching backend for the API."""
     run('memcached -d', echo=True)
 
 @task
