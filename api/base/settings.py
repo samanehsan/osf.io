@@ -61,6 +61,14 @@ REST_FRAMEWORK = {
         'api.base.authentication.drf.OSFBasicAuthentication',
         'api.base.authentication.drf.OSFSessionAuthentication',
     ),
+    'DEFAULT_THROTTLE_CLASSES': (
+    'rest_framework.throttling.AnonRateThrottle',
+    'rest_framework.throttling.UserRateThrottle'
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/day',
+        'user': '1000/day'
+    }
 }
 
 MIDDLEWARE_CLASSES = (
