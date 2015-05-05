@@ -22,6 +22,7 @@ py-bcrypt==0.4
 pymongo==2.5.1
 python-dateutil==2.4.2
 python-gnupg==0.3.6
+python-memcached==1.54
 pytz==2014.9
 bleach==1.4.1
 html5lib==0.999
