@@ -118,3 +118,10 @@ STATICFILES_DIRS = (
     ('rest_framework_swagger/css', os.path.join(BASE_DIR, 'static/css')),
     ('rest_framework_swagger/images', os.path.join(BASE_DIR, 'static/images')),
 )
+
+
+# Settings for django rest framework swagger
+
+SWAGGER_SETTINGS = {
+    'api_path': '/api/v2/' if osf_settings.API_SERVER_PORT == '5000' else ''
+}
