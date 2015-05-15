@@ -28,7 +28,9 @@ AUTHENTICATION_BACKENDS = (
 DEBUG = osf_settings.DEBUG_MODE
 
 ALLOWED_HOSTS = [
-    '.osf.io'
+    '.osf.io',
+    'localhost',
+    '127.0.0.1'
 ]
 
 
