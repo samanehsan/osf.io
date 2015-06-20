@@ -163,3 +163,5 @@ FILE_OPERATION_FAILED = Mail(
     'file_operation_failed',
     subject='Your ${action} has failed',
 )
+
+SHARE_NOTIFICATION = Mail('share_notifications', subject='SHARE Notification')
