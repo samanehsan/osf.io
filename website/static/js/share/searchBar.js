@@ -50,7 +50,15 @@ SearchBar.view = function(ctrl) {
                             onclick: function(){
                                 location.href = '/share/atom/?' + ctrl.atomParams();
                             }
-                        }, m('i.fa.fa-rss.fa-lg'))
+                        }, m('i.fa.fa-rss.fa-lg')),
+                        m('button.btn.osf-search-btn', {
+                            'data-toggle': 'tooltip',
+                            'title': 'Create search alert',
+                            'data-placement': 'bottom',
+                            onclick: function(){
+                                location.href = '/share/emails/?' + ctrl.atomParams();
+                            }
+                        }, m('i.fa.fa-envelope.fa-lg'))
                     ])
                 ])
             ])
@@ -73,6 +81,7 @@ SearchBar.controller = function(vm) {
         var d = {};
         d.q = utils.buildQuery(self.vm);
         d.sort = self.vm.sortMap[self.vm.sort()] || null;
+        console.log($.param(d));
         return $.param(d);
     };
 

@@ -60,3 +60,9 @@ class NotificationDigest(StoredObject):
     event = fields.StringField()
     message = fields.StringField()
     node_lineage = fields.StringField(list=True)
+
+
+class ShareSubscription(StoredObject):
+    _id = fields.StringField(primary=True, default=lambda: str(ObjectId()))
+    user_id = fields.StringField()
+    url = fields.StringField()

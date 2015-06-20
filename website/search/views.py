@@ -7,6 +7,7 @@ import httplib as http
 import bleach
 
 from flask import request
+from furl import furl
 
 from modularodm import Q
 from framework.auth.decorators import collect_auth
@@ -24,7 +25,7 @@ from website.search.exceptions import IndexNotFoundError
 from website.search.exceptions import MalformedQueryError
 from website.search.util import build_query
 from website.project.views.contributor import get_node_contributors_abbrev
-
+from website.notifications.model import ShareSubscription
 
 logger = logging.getLogger(__name__)
 
@@ -265,6 +266,15 @@ def search_share_atom(**kwargs):
         url=atom_url,
         to_atom=share_search.to_atom
     )
+
+@must_be_logged_in
+def search_share_notifications(auth):
+    user = auth.user
+    subscription = ShareSubscription(
+        user_id=user._id,
+        url=request.referrer
+    )
+    subscription.save()
 
 
 def search_share_providers():

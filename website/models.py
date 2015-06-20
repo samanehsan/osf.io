@@ -15,15 +15,14 @@ from website.oauth.models import ExternalAccount
 from website.identifiers.model import Identifier
 from website.citations.models import CitationStyle
 from website.conferences.model import Conference, MailRecord
-from website.notifications.model import NotificationDigest
-from website.notifications.model import NotificationSubscription
+from website.notifications.model import NotificationDigest, NotificationSubscription, ShareSubscription
 
 # All models
 MODELS = (
     User, ApiKey, Node, NodeLog,
     Tag, WatchConfig, Session, Guid, MetaSchema, Pointer,
     MailRecord, Comment, PrivateLink, MetaData, Conference,
-    NotificationSubscription, NotificationDigest, CitationStyle,
+    NotificationSubscription, NotificationDigest, ShareSubscription,
     CitationStyle, ExternalAccount, Identifier, BlacklistGuid
 )
 

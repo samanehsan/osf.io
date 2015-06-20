@@ -677,6 +677,7 @@ def make_url_map(app):
         Rule('/share/help/', 'get', {'help': settings.SHARE_API_DOCS_URL}, OsfWebRenderer('share_api_docs.mako')),
         Rule('/share_dashboard/', 'get', {}, OsfWebRenderer('share_dashboard.mako')),
         Rule('/share/atom/', 'get', search_views.search_share_atom, xml_renderer),
+        Rule('/share/emails/', 'get', search_views.search_share_notifications, json_renderer),
         Rule('/api/v1/user/search/', 'get', search_views.search_contributor, json_renderer),
 
         Rule(
