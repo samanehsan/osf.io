@@ -160,76 +160,66 @@
 
                 <div class="panel panel-default">
                     <span id="selectAddonsAnchor" class="anchor"></span>
-                    <div class="panel-heading clearfix">
-                        <h3 class="panel-title">Select Add-ons</h3>
-                    </div>
                     <div class="panel-body">
-                        <form id="selectAddonsForm">
 
-                            % for category in addon_categories:
+                    <div id="addonFilter" class="scripted">
+                        <div>
+                            <div class="filters pull-left">
+                                <span style="padding-right: 5px"><b>Filters: </b></span>
+                                <% addon_categories = ['all', 'storage', 'documentation', 'citations', 'other']%>
+                                %for category in addon_categories:
+                                    <a style="padding-right:5px" data-bind="click:setFilter.bind($data, '${category}')">${category}</a>
+                                %endfor
+                            </div>
+                            <div class="pull-right">
+                                <input style="margin-right: 5px"
+                                       type="checkbox"
+                                       data-bind="checked:showConfigured"/>
+                                Show only configured addons
+                            </div>
+                        </div>
 
-                                <%
-                                    addons = [
-                                        addon
-                                        for addon in addons_available
-                                        if category in addon.categories and category == 'documentation'
-                                    ]
-                                %>
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" data-bind="template: {foreach: visibleAddons, afterAdd: showElement}">
+                                <!-- ko if: $index() % 3 == 0 -->
+                                <div class="row">
+                                    ${render_addons("$parent.visibleAddons()[$index()]")}
 
-                                % if addons:
-                                    <h3>${category.capitalize()}</h3>
+                                    <!-- ko if: $parent.visibleAddons()[$index() + 1] -->
+                                    ${render_addons("$parent.visibleAddons()[$index() + 1]")}
+                                    <!-- /ko -->
 
-                                    % for addon in addons:
-                                        <div>
-                                            <label>
-                                                <input
-                                                    type="checkbox"
-                                                    name="${addon.short_name}"
-                                                    class="addon-select"
-                                                    ${'checked' if addon.short_name in addons_enabled else ''}
-                                                    ${'disabled' if (node['is_registration'] or bool(addon.added_mandatory)) else ''}
-                                                />
-                                                ${addon.full_name}
-                                            </label>
-                                        </div>
-                                    % endfor
-
-                                % endif
-
-                            % endfor
-
-                            <br />
-
-                            <button id="settings-submit" class="btn btn-success">
-                                Apply
-                            </button>
-                            <div class="addon-settings-message text-success" style="padding-top: 10px;"></div>
-
-                        </form>
-
+                                    <!-- ko if: $parent.visibleAddons()[$index() + 2] -->
+                                    ${render_addons("$parent.visibleAddons()[$index() + 2]")}
+                                    <!-- /ko -->
+                                </div>
+                               <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
                     </div>
                 </div>
 
-                    <span id="configureAddonsAnchor" class="anchor"></span>
+                <span id="configureAddonsAnchor" class="anchor"></span>
 
-                    <div id="configureAddons" class="panel panel-default">
+                <div id="configureAddons" class="panel panel-default">
 
-                        <div class="panel-heading clearfix">
-                            <h3 class="panel-title">Configure Add-ons</h3>
-                        </div>
-                        <div class="panel-body">
-
-                        % for addon in addon_settings or []:
-                            ${render_node_settings(addon)}
-
-                                % if not loop.last:
-                                    <hr />
-                                % endif
-
-                        % endfor
-
-                        </div>
+                    <div class="panel-heading clearfix">
+                        <h3 class="panel-title">Configure Add-ons</h3>
                     </div>
+                    <div class="panel-body">
+
+                    % for addon in addon_settings or []:
+                        ${render_node_settings(addon)}
+
+                            % if not loop.last:
+                                <hr />
+                            % endif
+
+                    % endfor
+
+                    </div>
+                </div>
 
             % endif
 
@@ -318,6 +308,24 @@
 
 </div>
 
+<%def name="render_addons(data)">
+    <div class="col-md-4">
+        <div class="m-t-sm m-b-sm p-md osf-box">
+            <!-- ko if: ${data}.iconUrl-->
+                <img class="addon-grid-icon" data-bind="attr: { src: ${data}.iconUrl }" />
+            <!-- /ko -->
+            <!-- ko ifnot: ${data}.iconUrl -->
+                <i class="fa fa-external-link addon-grid-icon"></i>
+            <!-- /ko -->
+            <div class="addon-name">
+                <span data-bind="text: ${data}.name"></span>
+                <i class="fa fa-check-circle" data-bind="visible:${data}.isConfigured"></i>
+            </div>
+            <p class="text-center text-muted" data-bind="text:${data}.category"></p>
+        </div>
+    </div>
+</%def>
+
 <%def name="render_node_settings(data)">
     <%
        template_name = data['node_settings_template']
@@ -334,10 +342,10 @@
     <% import json %>
     ${parent.javascript_bottom()}
     <script>
-      window.contextVars = window.contextVars || {};
-      window.contextVars.node = window.contextVars.node || {};
-      window.contextVars.node.nodeType = '${node['node_type']}';
-      window.contextVars.nodeCategories = ${json.dumps(categories)};
+        window.contextVars = window.contextVars || {};
+        window.contextVars.node = window.contextVars.node || {};
+        window.contextVars.node.nodeType = ${node['node_type'] | sjson, n };
+        window.contextVars.nodeCategories = ${categories | sjson, n };
     </script>
 
     <script type="text/javascript" src=${"/static/public/js/project-settings-page.js" | webpack_asset}></script>

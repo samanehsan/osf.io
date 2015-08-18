@@ -78,8 +78,81 @@ var NodeCategorySettings = oop.extend(
         }
     });
 
+var AddonFilter = function(selector){
+    var self = this;
+    self.filter = ko.observable();
+    self.showConfigured = ko.observable(false);
+    self.allAddons = ko.observableArray();
+
+    self.getAddons = function() {
+        var nodeSettingsUrl = nodeApiUrl + 'addon_settings/';
+        var request = $.ajax({
+            url: nodeSettingsUrl,
+            type: 'get',
+            dataType: 'json'
+        });
+        request.done(function(response) {
+            self.allAddons(
+                ko.utils.arrayMap(response, function(addon) {
+                    return new Addon(addon);
+                })
+            );
+        });
+    };
+    self.getAddons();
+
+    self.setFilter = function(filter) {
+        self.filter(filter);
+    };
+
+    self.visibleAddons = ko.computed(function() {
+        if (!self.filter() || self.filter() === 'all') {
+            if (!self.showConfigured()) {
+                return self.allAddons();
+            } else {
+                return ko.utils.arrayFilter(self.allAddons(), function (addon) {
+                    return addon.isConfigured();
+                });
+            }
+        } else {
+            if (!self.showConfigured()) {
+                return ko.utils.arrayFilter(self.allAddons(), function (addon) {
+                    return addon.category === self.filter();
+                });
+            } else {
+                return ko.utils.arrayFilter(self.allAddons(), function(addon) {
+                    return addon.isConfigured() && (addon.category === self.filter());
+                });
+            }
+        }
+    });
+
+    // Animation callback for the grid
+    this.showElement = function(elem) {
+        if (elem.nodeType === 1) {
+            $(elem).hide().fadeIn();
+        }
+    };
+
+};
+
+var Addon = function(addon) {
+    var self = this;
+    self.name = addon.name;
+    self.category = addon.category;
+    self.iconUrl = addon.iconUrl;
+    self.isConfigured = ko.observable(addon.isConfigured);
+};
+
+var AddonFilterModel = function(selector) {
+    var viewModel = new AddonFilter(selector);
+    $osf.applyBindings(viewModel, selector);
+    return viewModel;
+};
+
 var ProjectSettings = {
-    NodeCategorySettings: NodeCategorySettings
+    NodeCategorySettings: NodeCategorySettings,
+    AddonFilter: AddonFilterModel
 };
 
 // TODO: Pass this in as an argument rather than relying on global contextVars

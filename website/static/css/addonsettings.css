@@ -20,3 +20,25 @@
 .addon-icon {
     width: 20px;
 }
+
+.addon-name .fa-check-circle {
+    color:#5cb85c;
+    padding-left: 5px;
+}
+
+.addon-grid-icon {
+    width: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 25px;
+    margin-top: 5px;
+}
+
+.addon-name {
+    text-align: center;
+}
+
+#addonFilter .osf-box {
+    height:150px;
+}

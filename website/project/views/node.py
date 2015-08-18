@@ -299,6 +299,29 @@ def node_setting(auth, node, **kwargs):
 
     return ret
 
+@must_be_valid_project
+@must_be_logged_in
+@must_be_contributor
+def node_addon_setting(auth, node, **kwargs):
+
+    account_addons = ([addon for addon in settings.ADDONS_AVAILABLE if 'node' in addon.owners
+                        and addon.short_name not in settings.SYSTEM_ADDED_ADDONS['node'] and addon.short_name != 'osfstorage'])
+
+    return [serialize_addon(node, addon) for addon in account_addons]
+
+
+def serialize_addon(node, addon_config):
+    node_addon = node.get_addon(addon_config.short_name)
+
+    serialized_addon = {
+        'name': addon_config.full_name,
+        'category': addon_config.categories[0],
+        'iconUrl': addon_config.icon_url,
+        'isConfigured': node_addon and node_addon.has_auth
+    }
+    serialized_addon.update(addon_config.to_json())
+    return serialized_addon
+
 
 def collect_node_config_js(addons):
     """Collect webpack bundles for each of the addons' node-cfg.js modules. Return

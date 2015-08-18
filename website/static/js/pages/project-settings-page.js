@@ -44,6 +44,8 @@ function fixAffixWidth() {
 
 $(document).ready(function() {
 
+    var addonFilter = new ProjectSettings.AddonFilter('#addonFilter');
+
     // Apply KO bindings for Node Category Settings
     var categories = [];
     var keys = Object.keys(window.contextVars.nodeCategories);

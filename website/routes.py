@@ -1405,6 +1405,15 @@ def make_url_map(app):
             project_views.contributor.invite_contributor_post,
             json_renderer
         ),
+        Rule(
+            [
+                '/project/<pid>/addon_settings/',
+                '/project/<pid>/node/<nid>/addon_settings/',
+            ],
+            'get',
+            project_views.node.node_addon_setting,
+            json_renderer
+        ),
     ], prefix='/api/v1')
 
     # Set up static routing for addons
