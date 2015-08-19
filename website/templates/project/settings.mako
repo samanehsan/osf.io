@@ -180,20 +180,8 @@
                         </div>
 
                         <div class="row">
-                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" data-bind="template: {foreach: visibleAddons, afterAdd: showElement}">
-                                <!-- ko if: $index() % 3 == 0 -->
-                                <div class="row">
-                                    ${render_addons("$parent.visibleAddons()[$index()]")}
-
-                                    <!-- ko if: $parent.visibleAddons()[$index() + 1] -->
-                                    ${render_addons("$parent.visibleAddons()[$index() + 1]")}
-                                    <!-- /ko -->
-
-                                    <!-- ko if: $parent.visibleAddons()[$index() + 2] -->
-                                    ${render_addons("$parent.visibleAddons()[$index() + 2]")}
-                                    <!-- /ko -->
-                                </div>
-                               <!-- /ko -->
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" data-bind="template: {foreach: visibleAddons, as: 'addon', afterAdd: showElement}">
+                                ${render_addons("addon")}
                             </div>
                         </div>
                     </div>
@@ -309,17 +297,17 @@
 </div>
 
 <%def name="render_addons(data)">
-    <div class="col-md-4">
-        <div class="m-t-sm m-b-sm p-md osf-box">
+    <div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">
+        <div class="m-t-md m-b-sm p-md osf-box">
             <!-- ko if: ${data}.iconUrl-->
                 <img class="addon-grid-icon" data-bind="attr: { src: ${data}.iconUrl }" />
             <!-- /ko -->
             <!-- ko ifnot: ${data}.iconUrl -->
-                <i class="fa fa-external-link addon-grid-icon"></i>
+                <i class="fa fa-external-link fa-2x addon-grid-icon"></i>
             <!-- /ko -->
             <div class="addon-name">
-                <span data-bind="text: ${data}.name"></span>
-                <i class="fa fa-check-circle" data-bind="visible:${data}.isConfigured"></i>
+                <span class="text-bigger f-w-sm" data-bind="text: ${data}.name"></span>
+                    <i class="fa fa-check-circle" data-bind="visible:${data}.isConfigured"></i>
             </div>
             <p class="text-center text-muted" data-bind="text:${data}.category"></p>
         </div>

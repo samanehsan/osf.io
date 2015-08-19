@@ -27,7 +27,7 @@
 }
 
 .addon-grid-icon {
-    width: 20px;
+    width: 35px;
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -41,4 +41,5 @@
 
 #addonFilter .osf-box {
     height:150px;
+    cursor: pointer;
 }
