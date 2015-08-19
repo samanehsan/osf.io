@@ -34,10 +34,6 @@
                         % if 'write' in user['permissions']:
                             <li><a href="#selectAddonsAnchor">Select Add-ons</a></li>
 
-                            % if addon_enabled_settings:
-                                <li><a href="#configureAddonsAnchor">Configure Add-ons</a></li>
-                            % endif
-
                             <li><a href="#configureNotificationsAnchor">Configure Notifications</a></li>
                         %endif
 
@@ -188,27 +184,6 @@
                     </div>
                 </div>
 
-                <span id="configureAddonsAnchor" class="anchor"></span>
-
-                <div id="configureAddons" class="panel panel-default">
-
-                    <div class="panel-heading clearfix">
-                        <h3 class="panel-title">Configure Add-ons</h3>
-                    </div>
-                    <div class="panel-body">
-
-                    % for addon in addon_settings or []:
-                        ${render_node_settings(addon)}
-
-                            % if not loop.last:
-                                <hr />
-                            % endif
-
-                    % endfor
-
-                    </div>
-                </div>
-
             % endif
 
         % endif  ## End Select Addons
@@ -337,9 +312,5 @@
     </script>
 
     <script type="text/javascript" src=${"/static/public/js/project-settings-page.js" | webpack_asset}></script>
-
-    % for js_asset in addon_js:
-    <script src="${js_asset | webpack_asset}"></script>
-    % endfor
 
 </%def>

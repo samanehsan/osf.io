@@ -282,11 +282,7 @@ def node_setting(auth, node, **kwargs):
                         and addon.short_name not in settings.SYSTEM_ADDED_ADDONS['node']])
     ret['addon_categories'] = settings.ADDON_CATEGORIES
     ret['addons_available'] = accounts_addons
-    ret['addons_enabled'] = [addon.config.short_name for addon in node.get_addons()]
-    ret['addon_enabled_settings'] = [addon.short_name for addon in accounts_addons]
     ret['addon_capabilities'] = settings.ADDON_CAPABILITIES
-
-    ret['addon_js'] = collect_node_config_js(accounts_addons)
 
     ret['comments'] = {
         'level': node.comment_level,
