@@ -276,34 +276,21 @@ def node_forks(auth, node, **kwargs):
 def node_setting(auth, node, **kwargs):
 
     ret = _view_project(node, auth, primary=True)
-    ret['addon_settings'] = addon_utils.get_addons_by_config_type('node', auth.user, node)
-
     accounts_addons = ([addon for addon in settings.ADDONS_AVAILABLE if 'node' in addon.owners
                         and addon.short_name not in settings.SYSTEM_ADDED_ADDONS['node']])
-    ret['addon_categories'] = settings.ADDON_CATEGORIES
-    ret['addons_available'] = accounts_addons
-    ret['addon_capabilities'] = settings.ADDON_CAPABILITIES
+    serialized_addons = [serialize_addon(node, addon) for addon in accounts_addons if addon.short_name != 'osfstorage']
 
+    ret['addon_categories'] = settings.ADDON_CATEGORIES
+    ret['addon_capabilities'] = settings.ADDON_CAPABILITIES
+    ret['serialized_addons'] = serialized_addons
     ret['comments'] = {
         'level': node.comment_level,
     }
-
     ret['categories'] = Node.CATEGORY_MAP
     ret['categories'].update({
         'project': 'Project'
     })
-
     return ret
-
-@must_be_valid_project
-@must_be_logged_in
-@must_be_contributor
-def node_addon_setting(auth, node, **kwargs):
-
-    account_addons = ([addon for addon in settings.ADDONS_AVAILABLE if 'node' in addon.owners
-                        and addon.short_name not in settings.SYSTEM_ADDED_ADDONS['node'] and addon.short_name != 'osfstorage'])
-
-    return [serialize_addon(node, addon) for addon in account_addons]
 
 
 def serialize_addon(node, addon_config):

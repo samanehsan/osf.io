@@ -78,14 +78,14 @@ var NodeCategorySettings = oop.extend(
         }
     });
 
-var AddonFilter = function(selector){
+var AddonFilter = function(){
     var self = this;
     self.filter = ko.observable();
     self.showConfigured = ko.observable(false);
     self.allAddons = ko.observableArray();
 
     self.getAddons = function() {
-        var nodeSettingsUrl = nodeApiUrl + 'addon_settings/';
+        var nodeSettingsUrl = nodeApiUrl + 'settings/';
         var request = $.ajax({
             url: nodeSettingsUrl,
             type: 'get',
@@ -93,7 +93,7 @@ var AddonFilter = function(selector){
         });
         request.done(function(response) {
             self.allAddons(
-                ko.utils.arrayMap(response, function(addon) {
+                ko.utils.arrayMap(response.serialized_addons, function(addon) {
                     return new Addon(addon);
                 })
             );
@@ -128,7 +128,7 @@ var AddonFilter = function(selector){
     });
 
     // Animation callback for the grid
-    this.showElement = function(elem) {
+    self.showElement = function(elem) {
         if (elem.nodeType === 1) {
             $(elem).hide().fadeIn();
         }
@@ -145,7 +145,7 @@ var Addon = function(addon) {
 };
 
 var AddonFilterModel = function(selector) {
-    var viewModel = new AddonFilter(selector);
+    var viewModel = new AddonFilter();
     $osf.applyBindings(viewModel, selector);
     return viewModel;
 };

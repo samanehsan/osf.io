@@ -1407,13 +1407,14 @@ def make_url_map(app):
         ),
         Rule(
             [
-                '/project/<pid>/addon_settings/',
-                '/project/<pid>/node/<nid>/addon_settings/',
+                '/project/<pid>/settings/',
+                '/project/<pid>/node/<nid>/settings/',
             ],
             'get',
-            project_views.node.node_addon_setting,
+            project_views.node.node_setting,
             json_renderer
         ),
+
     ], prefix='/api/v1')
 
     # Set up static routing for addons

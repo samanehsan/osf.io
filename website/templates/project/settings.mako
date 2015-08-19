@@ -289,14 +289,6 @@
     </div>
 </%def>
 
-<%def name="render_node_settings(data)">
-    <%
-       template_name = data['node_settings_template']
-       tpl = template_name.render(**data)
-    %>
-    ${tpl}
-</%def>
-
 % for name, capabilities in addon_capabilities.iteritems():
     <script id="capabilities-${name}" type="text/html">${capabilities}</script>
 % endfor
