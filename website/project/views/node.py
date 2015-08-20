@@ -276,9 +276,7 @@ def node_forks(auth, node, **kwargs):
 def node_setting(auth, node, **kwargs):
 
     ret = _view_project(node, auth, primary=True)
-    accounts_addons = ([addon for addon in settings.ADDONS_AVAILABLE if 'node' in addon.owners
-                        and addon.short_name not in settings.SYSTEM_ADDED_ADDONS['node']])
-    serialized_addons = [serialize_addon(node, addon) for addon in accounts_addons if addon.short_name != 'osfstorage']
+    serialized_addons = addon_utils.get_addons_by_config_type('node', auth.user, node)
 
     ret['addon_categories'] = settings.ADDON_CATEGORIES
     ret['addon_capabilities'] = settings.ADDON_CAPABILITIES
@@ -291,19 +289,6 @@ def node_setting(auth, node, **kwargs):
         'project': 'Project'
     })
     return ret
-
-
-def serialize_addon(node, addon_config):
-    node_addon = node.get_addon(addon_config.short_name)
-
-    serialized_addon = {
-        'name': addon_config.full_name,
-        'category': addon_config.categories[0],
-        'iconUrl': addon_config.icon_url,
-        'isConfigured': node_addon and node_addon.has_auth
-    }
-    serialized_addon.update(addon_config.to_json())
-    return serialized_addon
 
 
 def collect_node_config_js(addons):

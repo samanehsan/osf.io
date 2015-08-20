@@ -138,10 +138,10 @@ var AddonFilter = function(){
 
 var Addon = function(addon) {
     var self = this;
-    self.name = addon.name;
+    self.name = addon.addon_full_name;
     self.category = addon.category;
-    self.iconUrl = addon.iconUrl;
-    self.isConfigured = ko.observable(addon.isConfigured);
+    self.iconUrl = addon.addon_icon_url;
+    self.isConfigured = ko.observable(addon.is_configured);
 };
 
 var AddonFilterModel = function(selector) {
