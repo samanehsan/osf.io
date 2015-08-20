@@ -143,14 +143,17 @@ def dropbox_config_put(node_addon, user_addon, auth, **kwargs):
 
 
 @must_have_permission('write')
-@must_have_addon('dropbox', 'user')
-@must_have_addon('dropbox', 'node')
-def dropbox_import_user_auth(auth, node_addon, user_addon, **kwargs):
+# @must_have_addon('dropbox', 'user')
+def dropbox_import_user_auth(auth, node, **kwargs):
     """Import dropbox credentials from the currently logged-in user to a node.
     """
     user = auth.user
+    user_addon = auth.user.get_addon('dropbox')
+    node_addon = node.get_addon('dropbox')
+
     node_addon.set_user_auth(user_addon)
     node_addon.save()
+
     return {
         'result': serialize_settings(node_addon, user),
         'message': 'Successfully imported access token from profile.',

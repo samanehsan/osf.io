@@ -313,6 +313,46 @@ def node_setting(auth, node, **kwargs):
     })
 
     return ret
+
+@must_be_valid_project
+@must_be_logged_in
+def addon_terms(auth, node, provider, **kwargs):
+    user_settings = auth.user.get_addon(provider)
+    import_token_url = node.api_url_for('dropbox_import_user_auth')
+    connect_account_url = node.api_url_for('dropbox_oauth_start')
+
+    return {
+        'node': node,
+        'addon_capabilities': settings.ADDON_CAPABILITIES.get(provider),
+        'user_has_auth': user_settings and user_settings.has_auth,
+        'full_name': 'dropbox'
+    }
+
+@must_be_valid_project
+@must_be_logged_in
+@must_be_contributor
+def addon_config(auth, node, provider, **kwargs):
+    ret = _view_project(node, auth, primary=True)
+
+    # addons_enabled = []
+    addon_enabled_settings = []
+    addon = node.get_addon(str(provider))
+
+    # addons_enabled.append(addon.config.short_name)
+    if 'node' in addon.config.configs:
+        config = addon.to_json(auth.user)
+        # inject the MakoTemplateLookup into the template context
+        # TODO inject only short_name and render fully client side
+        config['template_lookup'] = addon.config.template_lookup
+        config['addon_icon_url'] = addon.config.icon_url
+        addon_enabled_settings.append(config)
+
+    # ret['addons_enabled'] = addons_enabled
+    ret['addon_enabled_settings'] = addon_enabled_settings
+    ret['addon_js'] = collect_node_config_js(node.get_addons())
+
+    return ret
+
 def collect_node_config_js(addons):
     """Collect webpack bundles for each of the addons' node-cfg.js modules. Return
     the URLs for each of the JS modules to be included on the node addons config page.

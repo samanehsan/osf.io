@@ -3,6 +3,7 @@
 from framework.routing import Rule, json_renderer
 
 from website.addons.dropbox import views
+from website.routes import OsfWebRenderer
 
 
 auth_routes = {
@@ -55,7 +56,15 @@ api_routes = {
     'rules': [
 
         ##### Node settings #####
-
+        Rule(
+            [
+                '/project/<pid>/dropbox/info/',
+                '/project/<pid>/node/<nid>/dropbox/info'
+            ],
+            'get',
+            views.auth.dropbox_info,
+            OsfWebRenderer('../addons/dropbox/templates/addon_info.mako'),
+        ),
         Rule(
             ['/project/<pid>/dropbox/config/',
             '/project/<pid>/node/<nid>/dropbox/config/'],

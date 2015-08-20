@@ -772,6 +772,27 @@ def make_url_map(app):
             OsfWebRenderer('project/settings.mako')
         ),
 
+        Rule(
+            [
+                '/project/<pid>/<provider>/terms/',
+                '/project/<pid>/node/<nid>/<provider>/terms/',
+            ],
+            'get',
+            project_views.node.addon_terms,
+            OsfWebRenderer('project/addon/addon_terms.mako')
+        ),
+
+        Rule(
+            [
+                '/project/<pid>/<provider>/config/',
+                '/project/<pid>/node/<nid>/<provider>/config/',
+            ],
+            'get',
+            project_views.node.addon_config,
+            OsfWebRenderer('project/addon/addon_config.mako')
+        ),
+
+
         # Permissions
         Rule(
             [

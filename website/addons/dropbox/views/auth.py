@@ -17,12 +17,12 @@ from framework.auth.decorators import must_be_logged_in
 from website.util import api_url_for
 from website.util import web_url_for
 from website.project.model import Node
-from website.project.decorators import must_have_addon
+from website.project.decorators import must_have_addon, must_be_valid_project
 
 from website.addons.dropbox import settings
 from website.addons.dropbox.client import get_client_from_user_settings
 from dropbox.rest import ErrorResponse
-
+from website import settings as osf_settings
 
 logger = logging.getLogger(__name__)
 debug = logger.debug
@@ -58,7 +58,7 @@ def finish_auth(node):
         raise HTTPError(http.FORBIDDEN)
     except DropboxOAuth2Flow.NotApprovedException:  # User canceled flow
         if node:
-            return redirect(node.web_url_for('node_setting'))
+            return redirect(node.api_url_for('addon_config', provider='dropbox'))
         return redirect(web_url_for('user_addons'))
     except DropboxOAuth2Flow.ProviderException:
         raise HTTPError(http.FORBIDDEN)
@@ -77,6 +77,9 @@ def dropbox_oauth_start(auth, **kwargs):
         raise HTTPError(http.FORBIDDEN)
     # Handle if user has already authorized dropbox
     if user.has_addon('dropbox') and user.get_addon('dropbox').has_auth:
+        if nid:
+            node = Node.load(nid)
+            return redirect(node.web_url_for('addon_config'))
         return redirect(web_url_for('user_addons'))
     # Force the user to reapprove the dropbox authorization each time. Currently the
     # URI component force_reapprove is not configurable from the dropbox python client.
@@ -112,12 +115,15 @@ def dropbox_oauth_finish(auth, **kwargs):
     if node:
         del session.data['dropbox_auth_nid']
         # Automatically use newly-created auth
-        if node.has_addon('dropbox'):
-            node_addon = node.get_addon('dropbox')
-            node_addon.set_user_auth(user_settings)
-            node_addon.save()
-        return redirect(node.web_url_for('node_setting'))
-    return redirect(web_url_for('user_addons'))
+        if not node.has_addon('dropbox'):
+            node.add_addon('dropbox', auth=auth)
+            node.save()
+
+        node_addon = node.get_addon('dropbox')
+        node_addon.set_user_auth(user_settings)
+        node_addon.save()
+        return redirect(node.web_url_for('addon_config', provider='dropbox'))  # redirect to folder config view
+    return redirect(node.web_url_for('dropbox_import_user_auth'))
 
 @must_be_logged_in
 @must_have_addon('dropbox', 'user')
@@ -176,3 +182,17 @@ def dropbox_user_config_get(auth, **kwargs):
             'urls': urls
         },
     }, http.OK
+
+@must_be_valid_project
+@must_be_logged_in
+def dropbox_info(auth, node, **kwargs):
+    user_addon = auth.user.get_addon('dropbox')
+    node_addon = node.get_addon('dropbox')
+
+    if node_addon and node_addon.has_auth:
+        return redirect(node.web_url_for('addon_config', provider='dropbox'))
+
+    return {
+        'node': node,
+        # 'icon_url': user_addon.config.icon_url,
+    }
