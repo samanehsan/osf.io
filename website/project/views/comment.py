@@ -26,7 +26,7 @@ def update_comment_root_target_file(self, node, event_type, payload, user=None):
         source_node = Node.load(source['node']['_id'])
         destination_node = node
 
-        if event_type == 'addon_file_renamed' and source.get('provider') == 'osfstorage':
+        if event_type == 'addon_file_renamed' and (source.get('provider') == 'osfstorage' or source.get('path').endswith('/')):
             return
 
         if source.get('provider') == 'osfstorage':
