@@ -55,6 +55,7 @@ def update_comment_root_target_file(self, node, event_type, payload, user=None):
             destination_node.commented_files[new_file._id] = source_node.commented_files[old_file._id]
             del source_node.commented_files[old_file._id]
             source_node.save()
+            destination_node.save()
 
 
 @comment_added.connect
