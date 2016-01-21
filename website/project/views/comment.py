@@ -39,21 +39,23 @@ def update_comment_root_target_file(self, node, event_type, payload, user=None):
         else:
             old_file = FileNode.resolve_class(source.get('provider'), FileNode.FILE).get_or_create(source_node, source.get('path'))
 
-        new_file = FileNode.resolve_class(destination.get('provider'), FileNode.FILE).get_or_create(destination_node, destination.get('path'))
-        new_file.update(revision=None, data=destination)
+        has_comments = Comment.find(Q('root_target', 'eq', old_file._id)).count()
+        if has_comments:
+            new_file = FileNode.resolve_class(destination.get('provider'), FileNode.FILE).get_or_create(destination_node, destination.get('path'))
+            new_file.update(revision=None, data=destination)
 
-        if source_node._id != destination_node._id:
-            Comment.update(Q('root_target', 'eq', old_file._id), data={'node': destination_node})
+            if source_node._id != destination_node._id:
+                Comment.update(Q('root_target', 'eq', old_file._id), data={'node': destination_node})
 
-        Comment.update(Q('root_target', 'eq', old_file._id), data={'root_target': new_file})
-        Comment.update(Q('target', 'eq', old_file._id), data={'target': new_file})
+            Comment.update(Q('root_target', 'eq', old_file._id), data={'root_target': new_file})
+            Comment.update(Q('target', 'eq', old_file._id), data={'target': new_file})
 
-        # update node record of commented files
-        if old_file._id in source_node.commented_files:
-            destination_node.commented_files[new_file._id] = source_node.commented_files[old_file._id]
-            del source_node.commented_files[old_file._id]
-            source_node.save()
-            destination_node.save()
+            # update node record of commented files
+            if old_file._id in source_node.commented_files:
+                destination_node.commented_files[new_file._id] = source_node.commented_files[old_file._id]
+                del source_node.commented_files[old_file._id]
+                source_node.save()
+                destination_node.save()
 
 
 @comment_added.connect
