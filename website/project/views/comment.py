@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import requests
 import pytz
 from datetime import datetime
 from flask import request
@@ -8,7 +9,7 @@ from modularodm.exceptions import NoResultsFound
 from framework.auth.decorators import must_be_logged_in
 
 from website.addons.base.signals import file_updated
-from website.files.models import FileNode, TrashedFileNode
+from website.files.models import FileNode, TrashedFileNode, StoredFileNode
 from website.notifications.constants import PROVIDERS
 from website.notifications.emails import notify
 from website.models import Comment
@@ -16,6 +17,7 @@ from website.project.decorators import must_be_contributor_or_public
 from website.project.model import Node
 from website.project.signals import comment_added
 from website import settings
+from website.util import waterbutler_api_url_for
 
 
 @file_updated.connect
@@ -26,8 +28,21 @@ def update_comment_root_target_file(self, node, event_type, payload, user=None):
         source_node = Node.load(source['node']['_id'])
         destination_node = node
 
-        if event_type == 'addon_file_renamed' and (source.get('provider') == 'osfstorage' or source.get('path').endswith('/')):
-            return
+        if event_type == 'addon_file_renamed' and source.get('path').endswith('/'):
+            if not (source.get('provider') == 'osfstorage' or source.get('provider') == 'box'):
+                # get metadata from waterbutler
+                url = waterbutler_api_url_for(node._id, destination.get('provider'), destination.get('path'), meta=True)
+                waterbutler_request = requests.get(
+                    url,
+                    cookies=request.cookies.get(settings.COOKIE_NAME),
+                    headers={'Authorization': request.headers.get('Authorization')},
+                )
+                # for each file in folder metadata, find it's StoredFileNode and update its comments
+                for file_item in waterbutler_request.json()['data']:
+                    old_file = StoredFileNode.find_one(Q('provider', 'eq', source.get('provider')) &
+                                                       Q('node', 'eq', source_node) &
+                                                       Q('path', 'eq', '{}{}'.format(source['path'], file_item['attributes']['name'])))
+                    update_comments(old_file, source_node, file_item)
 
         if source.get('provider') == 'osfstorage':
             try:
@@ -41,21 +56,26 @@ def update_comment_root_target_file(self, node, event_type, payload, user=None):
 
         has_comments = Comment.find(Q('root_target', 'eq', old_file._id)).count()
         if has_comments:
-            new_file = FileNode.resolve_class(destination.get('provider'), FileNode.FILE).get_or_create(destination_node, destination.get('path'))
-            new_file.update(revision=None, data=destination)
+            update_comments(old_file, source_node, destination)
 
-            if source_node._id != destination_node._id:
-                Comment.update(Q('root_target', 'eq', old_file._id), data={'node': destination_node})
 
-            Comment.update(Q('root_target', 'eq', old_file._id), data={'root_target': new_file})
-            Comment.update(Q('target', 'eq', old_file._id), data={'target': new_file})
+def update_comments(old_file, source_node, destination):
+    destination_node = Node.load(destination['node']['_id'])
+    new_file = FileNode.resolve_class(destination.get('provider'), FileNode.FILE).get_or_create(destination_node, destination.get('path'))
+    new_file.update(revision=None, data=destination)
 
-            # update node record of commented files
-            if old_file._id in source_node.commented_files:
-                destination_node.commented_files[new_file._id] = source_node.commented_files[old_file._id]
-                del source_node.commented_files[old_file._id]
-                source_node.save()
-                destination_node.save()
+    if source_node._id != destination_node._id:
+        Comment.update(Q('root_target', 'eq', old_file._id), data={'node': destination_node})
+
+    Comment.update(Q('root_target', 'eq', old_file._id), data={'root_target': new_file})
+    Comment.update(Q('target', 'eq', old_file._id), data={'target': new_file})
+
+    # update node record of commented files
+    if old_file._id in source_node.commented_files:
+        destination_node.commented_files[new_file._id] = source_node.commented_files[old_file._id]
+        del source_node.commented_files[old_file._id]
+        source_node.save()
+        destination_node.save()
 
 
 @comment_added.connect
