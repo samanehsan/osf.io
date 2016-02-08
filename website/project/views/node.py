@@ -359,6 +359,14 @@ def node_contributors(auth, node, **kwargs):
     ret['adminContributors'] = utils.serialize_contributors(node.admin_contributors, node, admin=True)
     return ret
 
+def embeds(guid, **kwargs):
+    return {'guid':guid}
+    # ret = _view_project(node, auth, primary=True)
+    # ret['contributors'] = utils.serialize_contributors(node.contributors, node)
+    # ret['adminContributors'] = utils.serialize_contributors(node.admin_contributors, node, admin=True)
+    # return ret
+
+
 
 @must_have_permission(ADMIN)
 def configure_comments(node, **kwargs):

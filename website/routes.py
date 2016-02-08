@@ -140,6 +140,14 @@ def make_url_map(app):
 
     ### GUID ###
     process_rules(app, [
+        Rule(
+            [
+                '/<guid>/embed/'
+            ],
+            ['get', 'post', 'put', 'patch', 'delete'],
+            project_views.node.embeds,
+            OsfWebRenderer('project/embeds.mako')
+        ),
 
         Rule(
             [
@@ -335,6 +343,7 @@ def make_url_map(app):
             citation_views.node_citation,
             json_renderer,
         ),
+
 
     ], prefix='/api/v1')
 

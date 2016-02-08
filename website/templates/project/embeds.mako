@@ -1,0 +1,1 @@
+<iframe src="https://localhost:7778/render?url=https://localhost:5000/${guid}/?action=download%26mode=render" width="100%" scrolling="yes" height="416px" marginheight="0" frameborder="0" allowfullscreen webkitallowfullscreen>
