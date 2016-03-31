@@ -72,6 +72,8 @@
                             <li><a href="${node['url']}contributors/">Contributors</a></li>
                         % endif
 
+                        <li><a href="${node['url']}discussions/">Discussions</a></li>
+
                         % if user['has_read_permissions'] and not node['is_registration'] or (node['is_registration'] and 'admin' in user['permissions']):
                             <li><a href="${node['url']}settings/">Settings</a></li>
                         % endif

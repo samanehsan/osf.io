@@ -29,6 +29,13 @@ var ABUSE_CATEGORIES = {
 var FILES = 'files';
 var WIKI = 'wiki';
 
+var PAGE_TITLES = {
+    'total': 'All Comments',
+    'node': 'Project Overview',
+    'files': 'Files',
+    'wiki': 'Wiki'
+};
+
 /*
  * Format UTC datetime relative to current datetime, ensuring that time
  * is in the past.
@@ -71,7 +78,6 @@ var BaseComment = function() {
 
     self._loaded = false;
     self.id = ko.observable();
-    self.page = ko.observable('node'); // Default
 
     self.errorMessage = ko.observable();
     self.editErrorMessage = ko.observable();
@@ -82,7 +88,22 @@ var BaseComment = function() {
 
     self.submittingReply = ko.observable(false);
 
+    self.filter = ko.observable('total');
+    self.pageTitle = ko.computed(function() {
+        return PAGE_TITLES[self.filter()];
+    });
     self.comments = ko.observableArray();
+    self.filterComments = ko.computed(function() {
+        if (self.filter() === 'total') {
+            return ko.utils.arrayFilter(self.comments(), function(comment) {
+                return comment.targetType() !== 'comments';
+            });
+        } else {
+            return ko.utils.arrayFilter(self.comments(), function(comment) {
+                return comment.page() === self.filter() && comment.targetType() !== 'comments';
+            });
+        }
+    });
 
     self.replyNotEmpty = ko.pureComputed(function() {
         return notEmpty(self.replyContent());
@@ -90,6 +111,10 @@ var BaseComment = function() {
     self.commentButtonText = ko.computed(function() {
         return self.submittingReply() ? 'Commenting' : 'Comment';
     });
+
+    self.setFilter = function(filter) {
+        self.filter(filter);
+    };
 
 };
 
@@ -131,7 +156,7 @@ BaseComment.prototype.fetch = function() {
         if (urlParams.view_only && !window.contextVars.node.isPublic) {
             query += '&view_only=' + urlParams.view_only;
         }
-        if (self.id() !== undefined) {
+        if (self.id() !== undefined && self.id() !== null) {
             query += '&filter[target]=' + self.id();
         }
         var url = osfHelpers.apiV2Url(self.$root.nodeType + '/' + window.contextVars.node.id + '/comments/', {query: query});
@@ -268,6 +293,7 @@ var CommentModel = function(data, $parent, $root) {
     self.isAbuse = ko.observable(data.attributes.is_abuse);
     self.canEdit = ko.observable(data.attributes.can_edit);
     self.hasChildren = ko.observable(data.attributes.has_children);
+    self.targetType = ko.observable(data.relationships.target.links.related.meta.type);
 
     if (window.contextVars.node.anonymous) {
         self.author = {
@@ -570,7 +596,7 @@ var CommentListModel = function(options) {
     self.nodeId = ko.observable(options.nodeId);
     self.nodeApiUrl = options.nodeApiUrl;
     self.nodeType = options.isRegistration ? 'registrations' : 'nodes';
-    self.page(options.page);
+    self.page = ko.observable(options.page);
     self.id = ko.observable(options.rootId);
     self.rootId = ko.observable(options.rootId);
     self.fileId = options.fileId || '';

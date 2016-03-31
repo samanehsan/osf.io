@@ -575,6 +575,23 @@ def make_url_map(app):
         # ),
     ])
 
+    ### Discussions ###
+
+    # Web
+
+    process_rules(app, [
+        Rule(
+            [
+                '/project/<pid>/discussions/',
+                '/project/<pid>/node/<nid>/discussions/',
+            ],
+            'get',
+            project_views.comment.view_discussion,
+            OsfWebRenderer('project/discussions.mako'),
+        ),
+
+    ])
+
     # API
 
     process_rules(app, [

@@ -20,6 +20,7 @@ from website.models import Comment
 from website.project.decorators import must_be_contributor_or_public
 from website.project.model import Node
 from website.project.signals import comment_added
+from website.project.views.node import _view_project
 from website import settings
 
 
@@ -158,3 +159,12 @@ def update_comments_timestamp(auth, node, **kwargs):
     page = timestamp_info.get('page')
     root_id = timestamp_info.get('rootId')
     return _update_comments_timestamp(auth, node, page, root_id)
+
+
+@must_be_contributor_or_public
+def view_discussion(auth, **kwargs):
+    """
+    Returns information needed to get comments for the total discussion page
+    """
+    node = kwargs['node'] or kwargs['project']
+    return _view_project(node, auth, primary=True)

@@ -60,6 +60,7 @@ var entry = {
     'share-embed-page': staticPath('js/pages/share-embed-page.js'),
     'render-nodes': staticPath('js/pages/render-nodes.js'),
     'institution-page': staticPath('js/pages/institution-page.js'),
+    'discussions-page': staticPath('js/pages/discussions-page.js'),
     // Commons chunk
     'vendor': [
         // Vendor libraries
