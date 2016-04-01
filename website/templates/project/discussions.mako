@@ -7,7 +7,7 @@
 % endif
 
 <div class="row">
-    <div id="discussions">
+    <div id="discussions" class="scripted">
         <div class="col-sm-3 affix-parent">
             <div class="panel panel-default osf-affix" data-spy="affix" data-offset-top="70" data-offset-bottom="263">
                 <ul class="nav nav-stacked nav-pills">
@@ -41,7 +41,12 @@
         <div class="col-sm-9">
             <h3 data-bind="text:pageTitle"></h3>
             <div data-bind="template: {name: 'commentTemplate', foreach: filterComments}"></div>
-            <div data-bind="if: filterComments().length == 0">
+            <!-- ko if: loadingComments -->
+            <div style="text-align: center;">
+                <div class="logo-spin logo-lg"></div>
+            </div>
+            <!-- /ko -->
+            <div data-bind="if: filterComments().length == 0 && !loadingComments()">
                 <div data-bind="if: filter() == 'total'">
                     There are no comments on this project yet. Go to the
                     <a href="${node['url']}">project overview page</a> and open the comment pane to make a comment.
