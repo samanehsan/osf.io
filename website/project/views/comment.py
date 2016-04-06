@@ -167,4 +167,24 @@ def view_discussion(auth, **kwargs):
     Returns information needed to get comments for the total discussion page
     """
     node = kwargs['node'] or kwargs['project']
-    return _view_project(node, auth, primary=True)
+    page = request.args.get('page', None)
+    ret = _view_project(node, auth, primary=True)
+    ret.update({
+        'page': page or 'total'
+    })
+    return ret
+
+
+@must_be_contributor_or_public
+def view_comment(auth, **kwargs):
+    """
+    Returns information needed to get comments for the total discussion page
+    """
+    node = kwargs['node'] or kwargs['project']
+    comment_id = kwargs['cid']
+    ret = _view_project(node, auth, primary=True)
+    ret.update({
+        'comment_id': comment_id,
+        'page': None
+    })
+    return ret

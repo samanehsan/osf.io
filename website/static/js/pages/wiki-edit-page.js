@@ -182,6 +182,7 @@ if ($comments.length && window.contextVars.wiki.wikiID !== 'None') {
         page: 'wiki',
         rootId: window.contextVars.wiki.wikiID,
         fileId: null,
+        commentId:null,
         canComment: window.contextVars.currentUser.canComment,
         hasChildren: window.contextVars.node.hasChildren,
         currentUser: currentUser

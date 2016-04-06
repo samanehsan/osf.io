@@ -112,6 +112,11 @@
     cursor: pointer;
 }
 
+.comment-link-icon a {
+    color: #333;
+    text-decoration: none;
+}
+
 .comment-content img{
   vertical-align: middle;
   display: block;

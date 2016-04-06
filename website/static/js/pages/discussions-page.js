@@ -14,6 +14,7 @@ var options = {
     page: 'total',
     rootId: null,
     fileId: null,
+    commentId: window.contextVars.comment.id,
     canComment: window.contextVars.currentUser.canComment,
     hasChildren: window.contextVars.node.hasChildren,
     currentUser: currentUser

@@ -90,6 +90,11 @@
                         <!-- Action bar -->
                         <div style="display: inline">
                             <div data-bind="ifnot: editing" class="comment-actions pull-right">
+                                <span class="comment-link-icon">
+                                    <a data-bind="attr: {href: commentUrl}">
+                                        <i class="fa fa-link"></i>
+                                    </a>
+                                </span>
                                 <span data-bind="if: canEdit, click: edit">
                                     <i class="fa fa-pencil"></i>
                                 </span>

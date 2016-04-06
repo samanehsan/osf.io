@@ -61,6 +61,7 @@ if ($comments.length) {
         page: 'node',
         rootId: window.contextVars.node.id,
         fileId: null,
+        commentId: null,
         canComment: window.contextVars.currentUser.canComment,
         hasChildren: window.contextVars.node.hasChildren,
         currentUser: currentUser

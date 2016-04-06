@@ -589,7 +589,15 @@ def make_url_map(app):
             project_views.comment.view_discussion,
             OsfWebRenderer('project/discussions.mako'),
         ),
-
+        Rule(
+            [
+                '/project/<pid>/discussions/<cid>/',
+                '/project/<pid>/node/<nid>/discussions/<cid>/',
+            ],
+            'get',
+            project_views.comment.view_comment,
+            OsfWebRenderer('project/discussions.mako'),
+        ),
     ])
 
     # API

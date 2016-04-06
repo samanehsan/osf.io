@@ -511,6 +511,7 @@ if ($comments.length) {
         page: 'files',
         rootId: window.contextVars.file.guid,
         fileId: window.contextVars.file.id,
+        commentId: null,
         canComment: window.contextVars.currentUser.canComment,
         hasChildren: window.contextVars.node.hasChildren,
         currentUser: currentUser
