@@ -39,9 +39,9 @@
 
         <div class="col-sm-9">
             <div id="discussions" class="scripted">
-                %if not page:
-                    This is a single comment thread.
-                %else:
+                %if not page and parent_id:
+                    View the full comment thread <a href="${node['url'] + 'discussions/' + parent_id}">here</a>.
+                %elif page:
                     <h3 data-bind="text:pageTitle"></h3>
                     <div data-bind="if: filteredComments().length == 0 && !loadingComments()">
                         %if page == 'total':

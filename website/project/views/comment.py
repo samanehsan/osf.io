@@ -182,9 +182,18 @@ def view_comment(auth, **kwargs):
     """
     node = kwargs['node'] or kwargs['project']
     comment_id = kwargs['cid']
+    comment = Comment.load(comment_id)
+    parent_id = get_parent_url(comment)
     ret = _view_project(node, auth, primary=True)
     ret.update({
         'comment_id': comment_id,
-        'page': None
+        'page': None,
+        'parent_id': parent_id if comment.target.referent._id != comment.root_target.referent._id else None
     })
     return ret
+
+
+def get_parent_url(comment):
+    if isinstance(comment.target.referent, Comment):
+        return get_parent_url(comment.target.referent)
+    return comment._id
