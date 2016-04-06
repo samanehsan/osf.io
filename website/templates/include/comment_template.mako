@@ -58,7 +58,7 @@
 
                         <div data-bind="ifnot: editing">
                             <span class="component-overflow" data-bind="html: contentDisplay"></span>
-                            <span class="pull-right comment-actions" data-bind="if: hasChildren()">
+                            <span class="pull-right comment-actions" data-bind="if: hasChildren() && !(level === $root.MAXLEVEL && $root.rootId())">
                                 <i data-bind="css: toggleIcon, click: toggle"></i>
                             </span>
                         </div>
@@ -161,6 +161,11 @@
             <!-- /ko -->
 
         </ul>
+
+        <!-- For the comment pane -->
+        <div data-bind="if:level === $root.MAXLEVEL && $root.rootId()">
+            <a data-bind="attr: {href: commentUrl}">Continue this thread &#8594;</a>
+        </div>
 
     </div>
 

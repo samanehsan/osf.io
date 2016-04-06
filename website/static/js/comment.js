@@ -36,6 +36,8 @@ var PAGE_TITLES = {
     'wiki': 'Wiki'
 };
 
+var MAX_COMMENT_LEVEL = 5;
+
 /*
  * Format UTC datetime relative to current datetime, ensuring that time
  * is in the past.
@@ -90,12 +92,24 @@ var BaseComment = function() {
 
     self.comments = ko.observableArray();
 
+    self.filteredComments = ko.computed(function() {
+        if (self.commentId) {
+            return self.comments();
+        } else {
+            return ko.utils.arrayFilter(self.comments(), function(comment) {
+                return comment.targetType() !== 'comments';
+            });
+        }
+    });
+
     self.replyNotEmpty = ko.pureComputed(function() {
         return notEmpty(self.replyContent());
     });
     self.commentButtonText = ko.computed(function() {
         return self.submittingReply() ? 'Commenting' : 'Comment';
     });
+
+    self.level = 0;
 
 };
 
@@ -252,6 +266,9 @@ BaseComment.prototype.submitReply = function() {
         self.replyErrorMessage('');
         self.errorMessage('');
         self.onSubmitSuccess(response);
+        if (self.level >= MAX_COMMENT_LEVEL) {
+            window.location.href = self.commentUrl;
+        }
     });
     request.fail(function(xhr, status, error) {
         self.cancelReply();
@@ -356,6 +373,8 @@ var CommentModel = function(data, $parent, $root) {
     self.nodeUrl = '/' + self.$root.nodeId() + '/';
 
     self.commentUrl = self.nodeUrl + 'discussions/' + self.id() + '/';
+
+    self.level = self.$parent.level + 1;
 
 };
 
@@ -583,6 +602,7 @@ var CommentListModel = function(options) {
 
     self.$root = self;
     self.MAXLENGTH = MAXLENGTH;
+    self.MAXLEVEL = MAX_COMMENT_LEVEL;
 
     self.editors = 0;
     self.nodeId = ko.observable(options.nodeId);
@@ -597,7 +617,6 @@ var CommentListModel = function(options) {
     self.hasChildren = ko.observable(options.hasChildren);
     self.author = options.currentUser;
     self.loadingComments = ko.observable(true);
-
     self.togglePane = options.togglePane;
 
     self.pageTitle = ko.computed(function() {

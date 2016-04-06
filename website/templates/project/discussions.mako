@@ -43,7 +43,7 @@
                     This is a single comment thread.
                 %else:
                     <h3 data-bind="text:pageTitle"></h3>
-                    <div data-bind="if: comments().length == 0 && !loadingComments()">
+                    <div data-bind="if: filteredComments().length == 0 && !loadingComments()">
                         %if page == 'total':
                         <div>
                             There are no comments on this project yet. Go to the
@@ -67,7 +67,7 @@
                         %endif
                     </div>
                 %endif
-                <div data-bind="template: {name: 'commentTemplate', foreach: comments}"></div>
+                <div data-bind="template: {name: 'commentTemplate', foreach: filteredComments}"></div>
                 <!-- ko if: loadingComments -->
                 <div style="text-align: center;">
                     <div class="logo-spin logo-lg"></div>
