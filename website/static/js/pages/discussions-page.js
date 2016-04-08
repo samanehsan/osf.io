@@ -11,7 +11,7 @@ var options = {
     nodeId : window.contextVars.node.id,
     nodeApiUrl: window.contextVars.node.urls.api,
     isRegistration: window.contextVars.node.isRegistration,
-    page: 'total',
+    page: window.contextVars.comment.page,
     rootId: null,
     fileId: null,
     commentId: window.contextVars.comment.id,

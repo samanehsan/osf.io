@@ -698,12 +698,17 @@ var onOpen = function(page, rootId, nodeApiUrl, currentUserId) {
  * }
  */
 var init = function(commentLinkSelector, commentPaneSelector, options) {
-    var cp = new CommentPane(commentPaneSelector, {
-        onOpen: function(){
-            return onOpen(options.page, options.rootId, options.nodeApiUrl, options.currentUser.id);
-        }
-    });
-    options.togglePane = cp.toggle;
+    if (options.commentId !== null) {
+        onOpen(options.page, options.rootId, options.nodeApiUrl, options.currentUser.id);
+        options.togglePane = null;
+    } else {
+        var cp = new CommentPane(commentPaneSelector, {
+            onOpen: function () {
+                return onOpen(options.page, options.rootId, options.nodeApiUrl, options.currentUser.id);
+            }
+        });
+        options.togglePane = cp.toggle;
+    }
     var viewModel = new CommentListModel(options);
     osfHelpers.applyBindings(viewModel, commentLinkSelector);
     osfHelpers.applyBindings(viewModel, commentPaneSelector);

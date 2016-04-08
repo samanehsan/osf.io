@@ -89,6 +89,7 @@ ${parent.javascript_bottom()}
 <script>
     window.contextVars.comment = {};
     window.contextVars.comment.id = "${comment_id or ''}";
+    window.contextVars.comment.page = "${page or ''}";
 </script>
 <script src=${"/static/public/js/discussions-page.js" | webpack_asset}></script>
 </%def>

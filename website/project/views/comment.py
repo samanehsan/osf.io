@@ -13,7 +13,7 @@ from modularodm import Q
 from framework.guid.model import Guid
 
 from website.addons.base.signals import file_updated
-from website.files.models import FileNode, TrashedFileNode
+from website.files.models import FileNode, TrashedFileNode, StoredFileNode
 from website.notifications.constants import PROVIDERS
 from website.notifications.emails import notify
 from website.models import Comment
@@ -137,6 +137,7 @@ def is_reply(target):
 
 
 def _update_comments_timestamp(auth, node, page=Comment.OVERVIEW, root_id=None):
+    from website.addons.wiki.model import NodeWikiPage
     if node.is_contributor(auth.user):
         enqueue_postcommit_task(partial(ban_url, node, []))
         if root_id is not None:
@@ -144,14 +145,34 @@ def _update_comments_timestamp(auth, node, page=Comment.OVERVIEW, root_id=None):
             if guid_obj is not None:
                 enqueue_postcommit_task(partial(ban_url, guid_obj.referent, []))
 
-        # update node timestamp
-        if page == Comment.OVERVIEW:
-            root_id = node._id
-        auth.user.comments_viewed_timestamp[root_id] = datetime.utcnow()
-        auth.user.save()
-        return {root_id: auth.user.comments_viewed_timestamp[root_id].isoformat()}
+        # update all timestamps for the project or by page type (wiki or files)
+        timestamp = datetime.utcnow()
+        updated_timestamps = {}
+        if page == 'total':
+            auth.user.comments_viewed_timestamp[node._id] = timestamp
+            updated_timestamps[node._id] = timestamp.isoformat()
+        if not root_id and not page == Comment.OVERVIEW:
+            for root_target_id in auth.user.comments_viewed_timestamp:
+                root_target = Guid.load(root_target_id)
+                belongs_to_node = root_target and hasattr(root_target.referent, 'node') and root_target.referent.node._id == node._id
+                if belongs_to_node:
+                    if page == 'total' or ((page == Comment.FILES and isinstance(root_target.referent, StoredFileNode)) or
+                            (page == Comment.WIKI and isinstance(root_target.referent, NodeWikiPage))):
+                        auth.user.comments_viewed_timestamp[root_target_id] = timestamp
+                        updated_timestamps[root_target_id] = timestamp.isoformat()
+            auth.user.save()
+            return updated_timestamps
+
+        # update timestamp for a single root target
+        else:
+            if page == Comment.OVERVIEW:
+                root_id = node._id
+            auth.user.comments_viewed_timestamp[root_id] = datetime.utcnow()
+            auth.user.save()
+            return {root_id: auth.user.comments_viewed_timestamp[root_id].isoformat()}
     else:
         return {}
+
 
 @must_be_contributor_or_public
 def update_comments_timestamp(auth, node, **kwargs):
